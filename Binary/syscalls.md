@@ -467,29 +467,29 @@
 | 0465 | NtLoadEnclaveData |   |   |   |   |   |   |   |   | 248 | 250 | 253 | 254 | 255 | 256 | 257 | 257 | 262 | 262 | 262 | 
 | 0466 | NtCommitRegistryTransaction |   |   |   |   |   |   |   |   |   | 147 | 148 | 149 | 150 | 150 | 150 | 150 | 152 | 152 | 152 | 
 | 0467 | NtCreateRegistryTransaction |   |   |   |   |   |   |   |   |   | 178 | 181 | 182 | 183 | 183 | 184 | 184 | 188 | 188 | 188 | 
-| 0468 | NtOpenRegistryTransaction |   |   |   |   |   |   |   |   |   | 282 | 286 | 288 | 290 | 291 | 292 | 292 | 297 | 297 | 298 | 
-| 0469 | NtQuerySecurityPolicy |   |   |   |   |   |   |   |   |   | 329 | 335 | 338 | 340 | 341 | 342 | 342 | 348 | 348 | 349 | 
-| 0470 | NtRollbackRegistryTransaction |   |   |   |   |   |   |   |   |   | 364 | 370 | 373 | 375 | 376 | 377 | 377 | 383 | 383 | 384 | 
-| 0471 | NtSetCachedSigningLevel2 |   |   |   |   |   |   |   |   |   | 375 | 381 | 384 | 386 | 387 | 388 | 388 | 394 | 394 | 395 | 
-| 0472 | NtAcquireProcessActivityReference |   |   |   |   |   |   |   |   |   |   | 103 | 103 | 103 | 103 | 103 | 103 | 104 | 104 | 104 | 
-| 0473 | NtCompareSigningLevels |   |   |   |   |   |   |   |   |   |   | 152 | 153 | 154 | 154 | 154 | 154 | 156 | 156 | 156 | 
-| 0474 | NtConvertBetweenAuxiliaryCounterAndPerformanceCounter |   |   |   |   |   |   |   |   |   |   | 157 | 158 | 159 | 159 | 159 | 159 | 162 | 162 | 162 | 
-| 0475 | NtLoadHotPatch |   |   |   |   |   |   |   |   |   |   | 254 | 255 | 256 |   |   |   |   |   |   | 
-| 0476 | NtQueryAuxiliaryCounterFrequency |   |   |   |   |   |   |   |   |   |   | 306 | 308 | 310 | 311 | 312 | 312 | 318 | 318 | 319 | 
-| 0477 | NtQueryInformationByName |   |   |   |   |   |   |   |   |   |   | 315 | 318 | 320 | 321 | 322 | 322 | 328 | 328 | 329 | 
-| 0478 | NtCallEnclave |   |   |   |   |   |   |   |   |   |   |   | 142 | 143 | 143 | 143 | 143 | 145 | 145 | 145 | 
-| 0479 | NtNotifyChangeDirectoryFileEx |   |   |   |   |   |   |   |   |   |   |   | 271 | 273 | 274 | 275 | 275 | 280 | 280 | 281 | 
-| 0480 | NtQueryDirectoryFileEx |   |   |   |   |   |   |   |   |   |   |   | 312 | 314 | 315 | 316 | 316 | 322 | 322 | 323 | 
-| 0481 | NtTerminateEnclave |   |   |   |   |   |   |   |   |   |   |   | 436 | 438 | 439 | 440 | 440 | 446 | 446 | 447 | 
-| 0482 | NtAllocateVirtualMemoryEx |   |   |   |   |   |   |   |   |   |   |   |   | 116 | 116 | 116 | 116 | 118 | 118 | 118 | 
-| 0483 | NtMapViewOfSectionEx |   |   |   |   |   |   |   |   |   |   |   |   | 269 | 270 | 271 | 271 | 276 | 276 | 277 | 
-| 0484 | NtCreateSectionEx |   |   |   |   |   |   |   |   |   |   |   |   |   | 185 | 186 | 186 | 190 | 190 | 190 | 
-| 0485 | NtManageHotPatch |   |   |   |   |   |   |   |   |   |   |   |   |   | 266 | 267 | 267 | 272 | 272 | 273 | 
-| 0486 | NtCreateCrossVmEvent |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 160 | 160 | 163 | 163 | 163 | 
-| 0487 | NtAcquireCrossVmMutant |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 103 | 103 | 103 | 
-| 0488 | NtAllocateUserPhysicalPagesEx |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 116 | 116 | 116 | 
-| 0489 | NtContinueEx |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 161 | 161 | 161 | 
-| 0490 | NtCreateCrossVmMutant |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 164 | 164 | 164 | 
-| 0491 | NtDirectGraphicsCall |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 217 | 217 | 217 | 
-| 0492 | NtPssCaptureVaSpaceBulk |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 316 | 316 | 317 | 
-| 0493 | NtLoadKey3 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 470 | 265 | 
+| 0468 | NtLoadKey3 |   |   |   |   |   |   |   |   |   | 450 |   |   |   | 463 |   |   |   | 470 | 265 | 
+| 0469 | NtOpenRegistryTransaction |   |   |   |   |   |   |   |   |   | 282 | 286 | 288 | 290 | 291 | 292 | 292 | 297 | 297 | 298 | 
+| 0470 | NtQuerySecurityPolicy |   |   |   |   |   |   |   |   |   | 329 | 335 | 338 | 340 | 341 | 342 | 342 | 348 | 348 | 349 | 
+| 0471 | NtRollbackRegistryTransaction |   |   |   |   |   |   |   |   |   | 364 | 370 | 373 | 375 | 376 | 377 | 377 | 383 | 383 | 384 | 
+| 0472 | NtSetCachedSigningLevel2 |   |   |   |   |   |   |   |   |   | 375 | 381 | 384 | 386 | 387 | 388 | 388 | 394 | 394 | 395 | 
+| 0473 | NtAcquireProcessActivityReference |   |   |   |   |   |   |   |   |   |   | 103 | 103 | 103 | 103 | 103 | 103 | 104 | 104 | 104 | 
+| 0474 | NtCompareSigningLevels |   |   |   |   |   |   |   |   |   |   | 152 | 153 | 154 | 154 | 154 | 154 | 156 | 156 | 156 | 
+| 0475 | NtConvertBetweenAuxiliaryCounterAndPerformanceCounter |   |   |   |   |   |   |   |   |   |   | 157 | 158 | 159 | 159 | 159 | 159 | 162 | 162 | 162 | 
+| 0476 | NtLoadHotPatch |   |   |   |   |   |   |   |   |   |   | 254 | 255 | 256 |   |   |   |   |   |   | 
+| 0477 | NtQueryAuxiliaryCounterFrequency |   |   |   |   |   |   |   |   |   |   | 306 | 308 | 310 | 311 | 312 | 312 | 318 | 318 | 319 | 
+| 0478 | NtQueryInformationByName |   |   |   |   |   |   |   |   |   |   | 315 | 318 | 320 | 321 | 322 | 322 | 328 | 328 | 329 | 
+| 0479 | NtCallEnclave |   |   |   |   |   |   |   |   |   |   |   | 142 | 143 | 143 | 143 | 143 | 145 | 145 | 145 | 
+| 0480 | NtNotifyChangeDirectoryFileEx |   |   |   |   |   |   |   |   |   |   |   | 271 | 273 | 274 | 275 | 275 | 280 | 280 | 281 | 
+| 0481 | NtQueryDirectoryFileEx |   |   |   |   |   |   |   |   |   |   |   | 312 | 314 | 315 | 316 | 316 | 322 | 322 | 323 | 
+| 0482 | NtTerminateEnclave |   |   |   |   |   |   |   |   |   |   |   | 436 | 438 | 439 | 440 | 440 | 446 | 446 | 447 | 
+| 0483 | NtAllocateVirtualMemoryEx |   |   |   |   |   |   |   |   |   |   |   |   | 116 | 116 | 116 | 116 | 118 | 118 | 118 | 
+| 0484 | NtMapViewOfSectionEx |   |   |   |   |   |   |   |   |   |   |   |   | 269 | 270 | 271 | 271 | 276 | 276 | 277 | 
+| 0485 | NtCreateSectionEx |   |   |   |   |   |   |   |   |   |   |   |   |   | 185 | 186 | 186 | 190 | 190 | 190 | 
+| 0486 | NtManageHotPatch |   |   |   |   |   |   |   |   |   |   |   |   |   | 266 | 267 | 267 | 272 | 272 | 273 | 
+| 0487 | NtCreateCrossVmEvent |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 160 | 160 | 163 | 163 | 163 | 
+| 0488 | NtAcquireCrossVmMutant |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 103 | 103 | 103 | 
+| 0489 | NtAllocateUserPhysicalPagesEx |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 116 | 116 | 116 | 
+| 0490 | NtContinueEx |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 161 | 161 | 161 | 
+| 0491 | NtCreateCrossVmMutant |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 164 | 164 | 164 | 
+| 0492 | NtDirectGraphicsCall |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 217 | 217 | 217 | 
+| 0493 | NtPssCaptureVaSpaceBulk |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | 316 | 316 | 317 | 

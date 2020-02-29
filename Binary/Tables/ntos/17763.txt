@@ -191,6 +191,7 @@ NtLoadDriver	255
 NtLoadEnclaveData	256
 NtLoadKey	257
 NtLoadKey2	258
+NtLoadKey3	463
 NtLoadKeyEx	259
 NtLockFile	260
 NtLockProductActivationKeys	261
