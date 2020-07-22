@@ -23,7 +23,8 @@
 + Windows 10 20H1 build 19041;
 + Windows 10 ADB build 19631;
 + Windows 10 ADB build 19645;
-+ Windows 10 21H1 build 20150.
++ Windows 10 21H1 build 20150;
++ Windows 10 21H1 build 20170.
 
 ** located in Tables\ntos
 
@@ -47,7 +48,8 @@
 + Windows 10 20H1 build 19041;
 + Windows 10 ADB build 19631;
 + Windows 10 ADB build 19645;
-+ Windows 10 21H1 build 20150.
++ Windows 10 21H1 build 20150;
++ Windows 10 21H1 build 20170.
 
 ** located in Tables\win32k
 
