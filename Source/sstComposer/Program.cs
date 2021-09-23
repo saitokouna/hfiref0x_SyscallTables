@@ -1,12 +1,12 @@
 ﻿/*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2014 - 2019
+*  (C) COPYRIGHT AUTHORS, 2014 - 2021
 *
 *  TITLE:       PROGRAM.CS
 *
-*  VERSION:     1.20
+*  VERSION:     1.21
 *
-*  DATE:        02 Oct 2019
+*  DATE:        21 Sep 2021
 *
 *  SSTC entrypoint.
 * 
@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 namespace sstc
 {
@@ -64,10 +65,16 @@ namespace sstc
 
         static void Main(string[] args)
         {
+            System.Console.WriteLine("SSTC - System Service Table Composer");
+            var assembly = Assembly.GetEntryAssembly();
+            var hashId = assembly.ManifestModule.ModuleVersionId;
+            Console.WriteLine("Build MVID: " + hashId);
+
+
             if (args.Length == 0)
             {
-                System.Console.WriteLine("Please enter a type of generated report.");
-                System.Console.WriteLine("Usage: sstc -m | -h [-w]");
+                System.Console.WriteLine("\r\nNo parameters specified\r\n");
+                System.Console.WriteLine("Usage: sstc -m | -h [-w]\r\nPress any key to continue");
                 System.Console.ReadKey();
                 return;
             }
@@ -80,7 +87,7 @@ namespace sstc
             }
             if (cmd != "-m" && cmd != "-h")
             {
-                System.Console.WriteLine("Invalid report type key, supported types keys are markdown [-m] and html [-h].");
+                System.Console.WriteLine("Invalid report type key, supported types keys are markdown [-m] and html [-h]\r\nPress any key to continue");
                 System.Console.ReadKey();
                 return;
             }
@@ -174,23 +181,26 @@ namespace sstc
                 MarkdownSubHeader += (" --- | ");
             }
 
-            StreamWriter file;
+            FileStream outputFile;
+            ASCIIEncoding asciiEncoding = new ASCIIEncoding();
+            MemoryStream ms = new MemoryStream();
+            var sw = new StreamWriter(ms, asciiEncoding);
 
             try
             {
                 if (cmd == "-m")
                 {
-                    if (opt != "-w")
-                    {
-                        file = new StreamWriter("syscalls.md", false, Encoding.UTF8);
-                    }
-                    else
-                    {
-                        file = new StreamWriter("w32ksyscalls.md", false, Encoding.UTF8);
-                    }
+                    Console.WriteLine("Composing markdown table");
 
-                    file.WriteLine(MarkdownHeader);
-                    file.WriteLine(MarkdownSubHeader);
+                    //
+                    // Generate markdown table as output.
+                    //
+
+                    string fileName = (opt != "-w") ? "syscalls.md" : "w32ksyscalls.md";
+
+                    outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+                    sw.WriteLine(MarkdownHeader);
+                    sw.WriteLine(MarkdownSubHeader);
 
                     foreach (var Entry in DataItems)
                     {
@@ -210,14 +220,23 @@ namespace sstc
                                 s += "  | ";
                             }
                         }
-                        file.WriteLine(s);
+                        sw.WriteLine(s);
                     }
-                    file.Close();
+
+                    sw.Flush();
+                    ms.WriteTo(outputFile);
+                    outputFile.Close();
+                    ms.Dispose();
+                    sw.Close();
 
                 }
-
-                if (cmd == "-h")
+                else
                 {
+                    //
+                    // Generate HTML table as output.
+                    //
+                    Console.WriteLine("Composing HTML table");
+
                     string ReportHead = "<!DOCTYPE html><html><head>" +
                                         "<style>" +
                                         "table, th, td {" +
@@ -247,24 +266,16 @@ namespace sstc
                     }
                     TableHead += RowEnd;
 
-                    string item = "";
+                    string fileName = (opt != "-w") ? "syscalls.html" : "w32ksyscalls.html";
+                    outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
 
-                    if (opt != "-w")
-                    {
-                        file = new StreamWriter("syscalls.html", false, Encoding.UTF8);
-                    }
-                    else
-                    {
-                        file = new StreamWriter("w32ksyscalls.html", false, Encoding.UTF8);
-                    }
-                    file.WriteLine(ReportHead);
-                    file.WriteLine(TableHead);
+                    sw.WriteLine(ReportHead);
+                    sw.WriteLine(TableHead);
 
                     for (int i = 0; i < DataItems.Count; i++)
                     {
                         var Entry = DataItems[i];
-
-                        item += "<tr><td>" + (i + 1).ToString() + ColEnd;
+                        var item = "<tr><td>" + (i + 1).ToString() + ColEnd;
                         item += ColStart + Entry.ServiceName + ColEnd;
 
                         for (int j = 0; j < fcount; j++)
@@ -281,10 +292,16 @@ namespace sstc
                             item += ColEnd;
                         }
                         item += RowEnd;
+                        sw.WriteLine(item);
                     }
-                    file.WriteLine(item);
-                    file.WriteLine(ReportEnd);
-                    file.Close();
+
+                    sw.WriteLine(ReportEnd);
+                    sw.Flush();
+                    ms.WriteTo(outputFile);
+                    outputFile.Close();
+                    ms.Dispose();
+                    sw.Close();
+
                 } // cmd == -h
 
             } //try

@@ -11,9 +11,9 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-m</StartArguments>
+    <StartArguments>-h -w</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <StartArguments>-h</StartArguments>
+    <StartArguments>-h -w</StartArguments>
   </PropertyGroup>
 </Project>
