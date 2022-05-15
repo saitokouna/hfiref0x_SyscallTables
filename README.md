@@ -24,6 +24,7 @@
 + Windows 10 20H2 build 19042;
 + Windows 10 21H1 build 19043;
 + Windows 10 21H2 build 19044;
++ Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 ADB build 22612.
 + Windows 11 ADB build 25115.
@@ -51,6 +52,7 @@
 + Windows 10 20H2 build 19042;
 + Windows 10 21H1 build 19043;
 + Windows 10 21H2 build 19044;
++ Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 ADB build 22610;
 + Windows 11 ADB build 25115.
@@ -78,8 +80,8 @@ Composer source code written in C#. In order to build from source you need Micro
 
 # Authors
 
-+ scg (c) 2018 - 2021 SyscallTables Project
-+ sstComposer (c) 2016 - 2021 SyscallTables Project
++ scg (c) 2018 - 2022 SyscallTables Project
++ sstComposer (c) 2016 - 2022 SyscallTables Project
 + wscg64 (c) 2016 - 2021 SyscallTables Project, portions (c) 2010 deroko of ARTeam
 
 Original scg (c) 2011 gr8
