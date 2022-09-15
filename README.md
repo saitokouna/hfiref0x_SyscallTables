@@ -26,12 +26,13 @@
 + Windows 10 21H2 build 19044;
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
-+ Windows 11 ADB build 22610;
 + Windows 11 22H2 build 22621;
++ Windows 11 22H2 build 22622;
 + Windows 11 ADB build 25115;
 + Windows 11 ADB build 25145;
 + Windows 11 ADB build 25163;
-+ Windows 11 ADB build 25179.
++ Windows 11 ADB build 25179;
++ Windows 11 ADB build 25201.
 
 ** located in Tables\ntos
 
@@ -58,11 +59,12 @@
 + Windows 10 21H2 build 19044;
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
-+ Windows 11 ADB build 22610;
 + Windows 11 22H2 build 22621;
++ Windows 11 22H2 build 22622;
 + Windows 11 ADB build 25145;
 + Windows 11 ADB build 25163;
-+ Windows 11 ADB build 25179.
++ Windows 11 ADB build 25179;
++ Windows 11 ADB build 25201.
 
 ** located in Tables\win32k
 
