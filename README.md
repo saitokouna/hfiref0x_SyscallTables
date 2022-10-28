@@ -24,6 +24,7 @@
 + Windows 10 20H2 build 19042;
 + Windows 10 21H1 build 19043;
 + Windows 10 21H2 build 19044;
++ Windows 10 22H2 build 19045;
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
@@ -54,6 +55,7 @@
 + Windows 10 20H2 build 19042;
 + Windows 10 21H1 build 19043;
 + Windows 10 21H2 build 19044;
++ Windows 10 22H2 build 19045;
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
