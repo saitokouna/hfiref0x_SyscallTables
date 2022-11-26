@@ -33,6 +33,7 @@
 
 NT6 (Windows Vista/7/8/8.1) + bonus NT5.2 (Windows XP x64)
 **View online** https://hfiref0x.github.io/NT6_syscalls.html
+
 NT10 (Windows 10/11)
 **View online** https://hfiref0x.github.io/NT10_syscalls.html
 
@@ -64,6 +65,7 @@ NT10 (Windows 10/11)
 
 NT6 (Windows Vista/7/8/8.1)
 **View online** https://hfiref0x.github.io/NT6_w32ksyscalls.html
+
 NT10 (Windows 10/11)
 **View online** https://hfiref0x.github.io/NT10_w32ksyscalls.html
 
