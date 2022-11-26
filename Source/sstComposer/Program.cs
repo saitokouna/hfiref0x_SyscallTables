@@ -1,12 +1,12 @@
 ﻿/*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2014 - 2021
+*  (C) COPYRIGHT AUTHORS, 2014 - 2022
 *
 *  TITLE:       PROGRAM.CS
 *
-*  VERSION:     1.21
+*  VERSION:     1.30
 *
-*  DATE:        21 Sep 2021
+*  DATE:        25 Nov 2022
 *
 *  SSTC entrypoint.
 * 
@@ -32,6 +32,127 @@ namespace sstc
         public int[] Indexes;
         public string ServiceName;
     }
+
+    public enum OptionTypeEnum
+    {
+        /// <summary>
+        /// A Long Name for an Option, e.g. --opt.
+        /// </summary>
+        LongName,
+
+        /// <summary>
+        /// A Short Name for an Option, e.g. -o.
+        /// </summary>
+        ShortName,
+
+        /// <summary>
+        /// A Symbol, that is neither a switch, nor an argument.
+        /// </summary>
+        Symbol
+    }
+
+    /// <summary>
+    /// An option passed by a Command Line application.
+    /// </summary>
+    public class CommandLineOption
+    {
+        /// <summary>
+        /// The Name of the Option.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The Value associated with this Option.
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// The Type of this Option.
+        /// </summary>
+        public OptionTypeEnum OptionType { get; set; }
+    }
+
+    /// <summary>
+    /// A simple parser to parse Command Line Arguments (https://www.bytefish.de/blog/command_line_parser.html)
+    /// </summary>
+    public static class CommandLineParser
+    {
+        public static IList<CommandLineOption> ParseOptions(string[] arguments)
+        {
+            // Holds the Results:
+            var results = new List<CommandLineOption>();
+
+            CommandLineOption lastOption = null;
+
+            foreach (string argument in arguments)
+            {
+                // What should we do here? Go to the next one:
+                if (string.IsNullOrWhiteSpace(argument))
+                {
+                    continue;
+                }
+
+                // We have found a Long-Name option:
+                if (argument.StartsWith("--", StringComparison.Ordinal))
+                {
+                    // The previous argument was an option, too. Let's give it back:
+                    if (lastOption != null)
+                    {
+                        results.Add(lastOption);
+                    }
+
+                    lastOption = new CommandLineOption
+                    {
+                        OptionType = OptionTypeEnum.LongName,
+                        Name = argument.Substring(2)
+                    };
+                }
+                // We have found a Short-Name option:
+                else if (argument.StartsWith("-", StringComparison.Ordinal))
+                {
+                    // The previous argument was an option, too. Let's give it back:
+                    if (lastOption != null)
+                    {
+                        results.Add(lastOption);
+                    }
+
+                    lastOption = new CommandLineOption
+                    {
+                        OptionType = OptionTypeEnum.ShortName,
+                        Name = argument.Substring(1)
+                    };
+                }
+                // We have found a symbol:
+                else if (lastOption == null)
+                {
+                    results.Add(new CommandLineOption
+                    {
+                        OptionType = OptionTypeEnum.Symbol,
+                        Name = argument
+                    });
+                }
+                // And finally this is a value:
+                else
+                {
+                    // Set the Value and return this option:
+                    lastOption.Value = argument;
+
+                    results.Add(lastOption);
+
+                    // And reset it, because we do not expect multiple parameters:
+                    lastOption = null;
+                }
+            }
+
+            if (lastOption != null)
+            {
+                results.Add(lastOption);
+            }
+
+            return results;
+        }
+    }
+
 
     class Program
     {
@@ -65,43 +186,54 @@ namespace sstc
 
         static void Main(string[] args)
         {
+            bool outputAsHtml = false, outputWin32k = false;
+            string tablesDirectory = "tables";       
+
             System.Console.WriteLine("SSTC - System Service Table Composer");
             var assembly = Assembly.GetEntryAssembly();
             var hashId = assembly.ManifestModule.ModuleVersionId;
             Console.WriteLine("Build MVID: " + hashId);
 
+            //
+            // Parse params.
+            //
 
-            if (args.Length == 0)
+            var result = CommandLineParser.ParseOptions(args).ToArray();
+
+            foreach (var param in result)
             {
-                System.Console.WriteLine("\r\nNo parameters specified\r\n");
-                System.Console.WriteLine("Usage: sstc -m | -h [-w]\r\nPress any key to continue");
-                System.Console.ReadKey();
-                return;
+                if (param.Name == "h")
+                {
+                    outputAsHtml = true;
+                }
+                else if (param.Name == "w")
+                {
+                    outputWin32k = true;
+                }
+                else if (param.Name == "d")
+                {
+                    if (param.Value != null)
+                    {
+                        tablesDirectory = param.Value;
+                    }
+                    else
+                    {
+                        Console.WriteLine("-d found but input tables directory is not specified, default will be used");
+                    }
+                } else
+                {
+                    Console.WriteLine("Unrecognized command \"{0}\"", param.Name);
+                }
             }
 
-            string opt = "";
-            string cmd = args[0];
-            if (args.Length > 1)
-            {
-                opt = args[1];
-            }
-            if (cmd != "-m" && cmd != "-h")
-            {
-                System.Console.WriteLine("Invalid report type key, supported types keys are markdown [-m] and html [-h]\r\nPress any key to continue");
-                System.Console.ReadKey();
-                return;
-            }
+            string tablesSubDirectory = (outputWin32k) ? "win32k" : "ntos";
 
-            string LookupDirectory = Directory.GetCurrentDirectory() + "\\tables\\";
+            //
+            // Combine path to the tables.
+            //
 
-            if (opt != "-w")
-            {
-                LookupDirectory += "ntos\\";
-            }
-            else
-            {
-                LookupDirectory += "win32k\\";
-            }
+            string LookupDirectory = Path.Combine(Directory.GetCurrentDirectory(), tablesDirectory);
+            LookupDirectory = Path.Combine(LookupDirectory, tablesSubDirectory);
 
             string[] Tables;
 
@@ -118,11 +250,9 @@ namespace sstc
             IComparer Comparer = new ItemsComparer();
             Array.Sort(Tables, Comparer);
 
-            int fcount = Tables.Count();
-            int count = 0;
+            int tablesCount = Tables.Count();
 
             List<sstTable> DataItems = new List<sstTable>();
-            int n = 0, id;
 
             //
             // Makrdown header.
@@ -134,6 +264,8 @@ namespace sstc
             //
             // Parse files into internal array.
             //
+
+            int nIndex = 0;
 
             foreach (var sName in Tables)
             {
@@ -154,20 +286,20 @@ namespace sstc
                         syscall_id = Convert.ToInt32(fData[i].Substring(u));
                         syscall_name = fData[i].Substring(0, u - 1);
 
-                        id = IndexOfItem(syscall_name, DataItems);
+                        int id = IndexOfItem(syscall_name, DataItems);
                         if (id != -1)
                         {
                             var sstEntry = DataItems[id];
-                            sstEntry.Indexes[n] = syscall_id;
+                            sstEntry.Indexes[nIndex] = syscall_id;
                         }
                         else
                         {
                             var sstEntry = new sstTable();
                             sstEntry.ServiceName = syscall_name;
-                            sstEntry.Indexes = new int[fcount];
-                            for (int k = 0; k < fcount; k++)
+                            sstEntry.Indexes = new int[tablesCount];
+                            for (int k = 0; k < tablesCount; k++)
                                 sstEntry.Indexes[k] = -1;
-                            sstEntry.Indexes[n] = syscall_id;
+                            sstEntry.Indexes[nIndex] = syscall_id;
                             DataItems.Add(sstEntry);
                         }
                     }
@@ -177,7 +309,7 @@ namespace sstc
                 {
                     System.Console.WriteLine(e.Message);
                 }
-                n++;
+                nIndex++;
                 MarkdownSubHeader += (" --- | ");
             }
 
@@ -188,7 +320,7 @@ namespace sstc
 
             try
             {
-                if (cmd == "-m")
+                if (!outputAsHtml)
                 {
                     Console.WriteLine("Composing markdown table");
 
@@ -196,11 +328,13 @@ namespace sstc
                     // Generate markdown table as output.
                     //
 
-                    string fileName = (opt != "-w") ? "syscalls.md" : "w32ksyscalls.md";
+                    string fileName = (outputWin32k) ? "w32ksyscalls.md" : "syscalls.md";
 
                     outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
                     sw.WriteLine(MarkdownHeader);
                     sw.WriteLine(MarkdownSubHeader);
+
+                    int count = 0;
 
                     foreach (var Entry in DataItems)
                     {
@@ -209,7 +343,7 @@ namespace sstc
                         var s = "| " + count.ToString("0000") + " | ";
                         s += Entry.ServiceName + " | ";
 
-                        for (int i = 0; i < fcount; i++)
+                        for (int i = 0; i < tablesCount; i++)
                         {
                             if (Entry.Indexes[i] != -1)
                             {
@@ -237,36 +371,41 @@ namespace sstc
                     //
                     Console.WriteLine("Composing HTML table");
 
-                    string ReportHead = "<!DOCTYPE html><html><head>" +
-                                        "<style>" +
-                                        "table, th, td {" +
-                                        "border: 1px solid black;" +
-                                        "border-collapse: collapse;" +
-                                        "} th, td {" +
-                                        "padding: 5px;" +
-                                        "} table tr:nth-child(even) { background-color: #eee;}" +
-                                        "table tr:nth-child(odd) { background-color:#fff;}" +
-                                        "table th { background-color: white; color: black; }" +
-                                        "</style></head><body>";
+                    string ReportHead = "<!DOCTYPE html><html><head><style>body { font-family: \"Segoe UI\", -apple-system, BlinkMacSystemFont, Roboto, Oxygen-Sans, Ubuntu, Cantarell, " +
+                        "\"Helvetica Neue\", sans-serif; line-height: 1.4; color: #333; background-color: #fff; padding: 0 5vw;} table { margin: 1em 0; border-collapse:" +
+                        " collapse; border: 0.1em solid #d6d6d6;} caption { text-align: left; padding: 0.25em 0.5em 0.5em 0.5em;}th,td { padding: 0.25em 0.5em 0.25em 1em;" +
+                        " vertical-align: text-top; text-align: left; text-indent: -0.5em; border: 0.1em solid #d6d6d6;}th { vertical-align: bottom; background-color: #666; color: #fff;}tr:nth-child(even) th[scope=row]" +
+                        " { background-color: #f2f2f2;}tr:nth-child(odd) th[scope=row] { background-color: #fff;}tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.05);}tr:nth-child(odd)" +
+                        " { background-color: rgba(255, 255, 255, 0.05);}th { position: -webkit-sticky; position: sticky; top: 0; z-index: 2;}th[scope=row] " + 
+                        "{ position: -webkit-sticky; position: sticky; left: 0; z-index: 1;}th[scope=row] { vertical-align: top; color: inherit; background-color: inherit; " + 
+                        "background: linear-gradient(90deg, transparent 0%, transparent calc(100% - .05em), #d6d6d6 " +
+                        "calc(100% - .05em), #d6d6d6 100%);}table:nth-of-type(2) th:not([scope=row]):first-child { left: 0; z-index: 3; background: linear-gradient(90deg, #666 0%, #666 " +
+                        "calc(100% - .05em), #ccc calc(100% - .05em), #ccc 100%);}th[scope=row] + td { min-width: 24em;}th[scope=row]" +
+                        " { min-width: 20em;}body { padding-bottom: 90vh;}</style></head><body>";
 
                     string ColStart = "<td>";
                     string ColEnd = "</td>";
                     string RowEnd = "</tr>";
 
                     string ReportEnd = "</table></body></html>";
-                    string TableHead = "<table><caption>Syscall Table Indexes</caption>" +
-                    "<tr><th style=\"width:20px\">#</th>" +
-                    "<th style=\"width:130px\">ServiceName</th>";
+                    string TableHead = "<table><caption>";
 
-                    for (int i = 0; i < fcount; i++)
+                    if (outputWin32k)
+                        TableHead += "Win32k syscalls";
+                    else
+                        TableHead += "Ntos syscalls";
+
+                    TableHead += "</caption><tr><th>#</th><th>ServiceName</th>";
+
+                    for (int i = 0; i < tablesCount; i++)
                     {
-                        TableHead += "<th style=\"width:40px\">" +
+                        TableHead += "<th>" +
                             Path.GetFileNameWithoutExtension(Tables[i]) + "</th>";
 
                     }
                     TableHead += RowEnd;
 
-                    string fileName = (opt != "-w") ? "syscalls.html" : "w32ksyscalls.html";
+                    string fileName = (outputWin32k) ? "w32ksyscalls.html" : "syscalls.html";
                     outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
 
                     sw.WriteLine(ReportHead);
@@ -278,7 +417,7 @@ namespace sstc
                         var item = "<tr><td>" + (i + 1).ToString() + ColEnd;
                         item += ColStart + Entry.ServiceName + ColEnd;
 
-                        for (int j = 0; j < fcount; j++)
+                        for (int j = 0; j < tablesCount; j++)
                         {
                             item += ColStart;
                             if (Entry.Indexes[j] != -1)
@@ -302,7 +441,7 @@ namespace sstc
                     ms.Dispose();
                     sw.Close();
 
-                } // cmd == -h
+                }
 
             } //try
             catch (Exception e)
