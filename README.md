@@ -27,14 +27,17 @@
 + Windows 11 22H2 build 22622;
 + Windows 11 22H2 build 22623;
 + Windows 11 ADB build 25217;
-+ Windows 11 ADB build 25247.
++ Windows 11 ADB build 25247;
++ Windows 11 ADB build 25267.
 
 ** located in Tables\ntos
 
 NT6 (Windows Vista/7/8/8.1) + bonus NT5.2 (Windows XP x64)
+
 **View online** https://hfiref0x.github.io/NT6_syscalls.html
 
 NT10 (Windows 10/11)
+
 **View online** https://hfiref0x.github.io/NT10_syscalls.html
 
 ## Win32k service tables
@@ -59,14 +62,17 @@ NT10 (Windows 10/11)
 + Windows 11 22H2 build 22622;
 + Windows 11 22H2 build 22623;
 + Windows 11 ADB build 25217;
-+ Windows 11 ADB build 25247.
++ Windows 11 ADB build 25247;
++ Windows 11 ADB build 25267.
 
 ** located in Tables\win32k
 
 NT6 (Windows Vista/7/8/8.1)
+
 **View online** https://hfiref0x.github.io/NT6_w32ksyscalls.html
 
 NT10 (Windows 10/11)
+
 **View online** https://hfiref0x.github.io/NT10_w32ksyscalls.html
 
 # Usage
