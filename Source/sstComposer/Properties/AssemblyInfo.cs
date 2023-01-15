@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("sstc")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Service table composer application")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UG North")]
 [assembly: AssemblyProduct("sstc")]
-[assembly: AssemblyCopyright("Copyright ©  2016 - 2022")]
+[assembly: AssemblyCopyright("Copyright ©  2016 - 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.3.22.11")]
+[assembly: AssemblyFileVersion("1.3.23.01")]

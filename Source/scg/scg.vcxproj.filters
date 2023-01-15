@@ -39,6 +39,9 @@
     <ClCompile Include="minirtl\_strcpy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="minirtl\_strcmpi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="minirtl\cmdline.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ntos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

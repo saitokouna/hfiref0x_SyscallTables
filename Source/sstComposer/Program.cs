@@ -1,12 +1,12 @@
 ﻿/*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2014 - 2022
+*  (C) COPYRIGHT AUTHORS, 2014 - 2023
 *
 *  TITLE:       PROGRAM.CS
 *
-*  VERSION:     1.30
+*  VERSION:     1.31
 *
-*  DATE:        25 Nov 2022
+*  DATE:        15 Jan 2023
 *
 *  SSTC entrypoint.
 * 
@@ -27,6 +27,14 @@ using System.Reflection;
 
 namespace sstc
 {
+    public enum TableTypeEnum
+    {
+        ttNtOs,
+        ttWin32k,
+        ttIum,
+        ttMax
+    }
+
     public class sstTable
     {
         public int[] Indexes;
@@ -184,10 +192,33 @@ namespace sstc
             }
         }
 
+        static TableTypeEnum GetSstTableType(string TableParam)
+        {
+            if (TableParam == "-w") return TableTypeEnum.ttWin32k;
+            if (TableParam == "-ium") return TableTypeEnum.ttIum;
+            return TableTypeEnum.ttNtOs;
+        }
+
+        static string GetOutputFileNameForType(TableTypeEnum TableType)
+        {
+            switch (TableType)
+            {
+                case TableTypeEnum.ttWin32k:
+                    return "w32ksyscalls";
+
+                case TableTypeEnum.ttIum:
+                    return "iumsyscalls";
+
+                default:
+                    return "syscalls";
+            }
+        }
+
         static void Main(string[] args)
         {
-            bool outputAsHtml = false, outputWin32k = false;
-            string tablesDirectory = "tables";       
+            TableTypeEnum tableType = TableTypeEnum.ttNtOs;
+            bool outputAsHtml = false;
+            string tablesDirectory = "tables";
 
             System.Console.WriteLine("SSTC - System Service Table Composer");
             var assembly = Assembly.GetEntryAssembly();
@@ -200,6 +231,18 @@ namespace sstc
 
             var result = CommandLineParser.ParseOptions(args).ToArray();
 
+            if (result.Length == 0)
+            {
+                Console.WriteLine("sstc [-d TablesDirectory] [-h] [-w] [-ium]");
+                Console.WriteLine("Parameters:");
+                Console.WriteLine("\t-d TablesDirectory - Optional, specify tables directory to combine, default value \"tables\"");
+                Console.WriteLine("\t-h                 - Optional, output result as HTML table, default markdown");
+                Console.WriteLine("\t-w                 - Optional, combine win32k syscalls, default ntos");
+                Console.WriteLine("\t-ium               - Optional, combine ium syscalls, mutually exclusive with -w parameter");
+                return;
+
+            }
+
             foreach (var param in result)
             {
                 if (param.Name == "h")
@@ -208,7 +251,11 @@ namespace sstc
                 }
                 else if (param.Name == "w")
                 {
-                    outputWin32k = true;
+                    tableType = TableTypeEnum.ttWin32k;
+                }
+                else if (param.Name == "ium")
+                {
+                    tableType = TableTypeEnum.ttIum;
                 }
                 else if (param.Name == "d")
                 {
@@ -220,13 +267,31 @@ namespace sstc
                     {
                         Console.WriteLine("-d found but input tables directory is not specified, default will be used");
                     }
-                } else
+                }
+                else
                 {
                     Console.WriteLine("Unrecognized command \"{0}\"", param.Name);
+                    return;
                 }
             }
 
-            string tablesSubDirectory = (outputWin32k) ? "win32k" : "ntos";
+            string tablesSubDirectory;
+
+            switch (tableType)
+            {
+                case TableTypeEnum.ttWin32k:
+                    tablesSubDirectory = "win32k";
+                    break;
+
+                case TableTypeEnum.ttIum:
+                    tablesSubDirectory = "ium";
+                    break;
+
+                default:
+                    tablesSubDirectory = "ntos";
+                    break;
+
+            }
 
             //
             // Combine path to the tables.
@@ -327,8 +392,8 @@ namespace sstc
                     //
                     // Generate markdown table as output.
                     //
-
-                    string fileName = (outputWin32k) ? "w32ksyscalls.md" : "syscalls.md";
+                    string fileName = GetOutputFileNameForType(tableType);
+                    fileName += ".md";
 
                     outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
                     sw.WriteLine(MarkdownHeader);
@@ -376,8 +441,8 @@ namespace sstc
                         " collapse; border: 0.1em solid #d6d6d6;} caption { text-align: left; padding: 0.25em 0.5em 0.5em 0.5em;}th,td { padding: 0.25em 0.5em 0.25em 1em;" +
                         " vertical-align: text-top; text-align: left; text-indent: -0.5em; border: 0.1em solid #d6d6d6;}th { vertical-align: bottom; background-color: #666; color: #fff;}tr:nth-child(even) th[scope=row]" +
                         " { background-color: #f2f2f2;}tr:nth-child(odd) th[scope=row] { background-color: #fff;}tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.05);}tr:nth-child(odd)" +
-                        " { background-color: rgba(255, 255, 255, 0.05);}th { position: -webkit-sticky; position: sticky; top: 0; z-index: 2;}th[scope=row] " + 
-                        "{ position: -webkit-sticky; position: sticky; left: 0; z-index: 1;}th[scope=row] { vertical-align: top; color: inherit; background-color: inherit; " + 
+                        " { background-color: rgba(255, 255, 255, 0.05);}th { position: -webkit-sticky; position: sticky; top: 0; z-index: 2;}th[scope=row] " +
+                        "{ position: -webkit-sticky; position: sticky; left: 0; z-index: 1;}th[scope=row] { vertical-align: top; color: inherit; background-color: inherit; " +
                         "background: linear-gradient(90deg, transparent 0%, transparent calc(100% - .05em), #d6d6d6 " +
                         "calc(100% - .05em), #d6d6d6 100%);}table:nth-of-type(2) th:not([scope=row]):first-child { left: 0; z-index: 3; background: linear-gradient(90deg, #666 0%, #666 " +
                         "calc(100% - .05em), #ccc calc(100% - .05em), #ccc 100%);}th[scope=row] + td { min-width: 24em;}th[scope=row]" +
@@ -390,10 +455,20 @@ namespace sstc
                     string ReportEnd = "</table></body></html>";
                     string TableHead = "<table><caption>";
 
-                    if (outputWin32k)
-                        TableHead += "Win32k syscalls";
-                    else
-                        TableHead += "Ntos syscalls";
+                    switch (tableType)
+                    {
+                        case TableTypeEnum.ttWin32k:
+                            TableHead += "Win32k syscalls";
+                            break;
+
+                        case TableTypeEnum.ttIum:
+                            TableHead += "IUM syscalls";
+                            break;
+
+                        default:
+                            TableHead += "Ntos syscalls";
+                            break;
+                    }
 
                     TableHead += "</caption><tr><th>#</th><th>ServiceName</th>";
 
@@ -405,7 +480,9 @@ namespace sstc
                     }
                     TableHead += RowEnd;
 
-                    string fileName = (outputWin32k) ? "w32ksyscalls.html" : "syscalls.html";
+                    string fileName = GetOutputFileNameForType(tableType);
+                    fileName += ".html";
+
                     outputFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
 
                     sw.WriteLine(ReportHead);
