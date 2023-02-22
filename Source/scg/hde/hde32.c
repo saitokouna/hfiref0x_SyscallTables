@@ -1,12 +1,9 @@
-/*
+﻿/*
  * Hacker Disassembler Engine 32 C
- * Copyright (c) 2008, Veacheslav Patkov
- * aLL rights reserved.
+ * Copyright (c) 2008-2009, Vyacheslav Patkov.
+ * All rights reserved.
  *
  */
-
-#include <stdint.h>
-#include <string.h>
 
 #include "hde32.h"
 #include "table32.h"
@@ -16,7 +13,12 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
     uint8_t x, c = 0, *p = (uint8_t *)code, cflags, opcode, pref = 0;
     uint8_t *ht = hde32_table, m_mod, m_reg, m_rm, disp_size = 0;
 
-    memset(hs,0,sizeof(hde32s));
+    // Avoid using memset to reduce the footprint.
+#ifndef _MSC_VER
+    memset((LPBYTE)hs, 0, sizeof(hde32s));
+#else
+    __stosb((LPBYTE)hs, 0, sizeof(hde32s));
+#endif
 
     for (x = 16; x; x--)
         switch (c = *p++) {
@@ -49,10 +51,11 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
                 goto pref_done;
         }
   pref_done:
-    if (!pref)
-        pref |= PRE_NONE;
 
     hs->flags = (uint32_t)pref << 23;
+
+    if (!pref)
+        pref |= PRE_NONE;
 
     if ((hs->opcode = c) == 0x0f) {
         hs->opcode2 = c = *p++;
@@ -125,11 +128,12 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
                     op &= -2;
                 }
                 for (; ht != table_end; ht++)
-                    if (*ht++ == op)
+                    if (*ht++ == op) {
                         if (!((*ht << m_reg) & 0x80))
                             goto no_lock_error;
                         else
                             break;
+                    }
                 hs->flags |= F_ERROR | F_ERROR_LOCK;
               no_lock_error:
                 ;
@@ -176,11 +180,12 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
                 table_end = ht + DELTA_OP2_ONLY_MEM - DELTA_OP_ONLY_MEM;
             }
             for (; ht != table_end; ht += 2)
-                if (*ht++ == opcode)
+                if (*ht++ == opcode) {
                     if (*ht++ & pref && !((*ht << m_reg) & 0x80))
                         goto error_operand;
                     else
                         break;
+                }
             goto no_error_operand;
         } else if (hs->opcode2) {
             switch (opcode) {
@@ -243,15 +248,15 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
         switch (disp_size) {
             case 1:
                 hs->flags |= F_DISP8;
-                hs->disp8 = *p;
+                hs->disp.disp8 = *p;
                 break;
             case 2:
                 hs->flags |= F_DISP16;
-                hs->disp16 = *(uint16_t *)p;
+                hs->disp.disp16 = *(uint16_t *)p;
                 break;
             case 4:
                 hs->flags |= F_DISP32;
-                hs->disp32 = *(uint32_t *)p;
+                hs->disp.disp32 = *(uint32_t *)p;
         }
         p += disp_size;
     } else if (pref & PRE_LOCK)
@@ -260,8 +265,8 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
     if (cflags & C_IMM_P66) {
         if (cflags & C_REL32) {
             if (pref & PRE_66) {
-                hs->flags |= F_REL16;
-                hs->rel16 = *(uint16_t *)p;
+                hs->flags |= F_IMM16 | F_RELATIVE;
+                hs->imm.imm16 = *(uint16_t *)p;
                 p += 2;
                 goto disasm_done;
             }
@@ -269,38 +274,41 @@ unsigned int hde32_disasm(const void *code, hde32s *hs)
         }
         if (pref & PRE_66) {
             hs->flags |= F_IMM16;
-            hs->imm16 = *(uint16_t *)p;
+            hs->imm.imm16 = *(uint16_t *)p;
             p += 2;
         } else {
             hs->flags |= F_IMM32;
-            hs->imm32 = *(uint32_t *)p;
+            hs->imm.imm32 = *(uint32_t *)p;
             p += 4;
         }
     }
 
     if (cflags & C_IMM16) {
-        if (hs->flags & F_IMM16) {
+        if (hs->flags & F_IMM32) {
+            hs->flags |= F_IMM16;
+            hs->disp.disp16 = *(uint16_t *)p;
+        } else if (hs->flags & F_IMM16) {
             hs->flags |= F_2IMM16;
-            hs->imm32 = *(uint16_t *)p;
+            hs->disp.disp16 = *(uint16_t *)p;
         } else {
             hs->flags |= F_IMM16;
-            hs->imm16 = *(uint16_t *)p;
+            hs->imm.imm16 = *(uint16_t *)p;
         }
         p += 2;
     }
     if (cflags & C_IMM8) {
         hs->flags |= F_IMM8;
-        hs->imm8 = *p++;
+        hs->imm.imm8 = *p++;
     }
 
     if (cflags & C_REL32) {
       rel32_ok:
-        hs->flags |= F_REL32;
-        hs->rel32 = *(uint32_t *)p;
+        hs->flags |= F_IMM32 | F_RELATIVE;
+        hs->imm.imm32 = *(uint32_t *)p;
         p += 4;
     } else if (cflags & C_REL8) {
-        hs->flags |= F_REL8;
-        hs->rel8 = *p++;
+        hs->flags |= F_IMM8 | F_RELATIVE;
+        hs->imm.imm8 = *p++;
     }
 
   disasm_done:

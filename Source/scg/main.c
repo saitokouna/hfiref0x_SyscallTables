@@ -233,6 +233,7 @@ VOID ProcessExportEntry(
 
                         if (ptrCode[i] == 0xB8) {
                             sid = *(ULONG*)(ptrCode + i + 1);
+                            break;
                         }
                     }
 

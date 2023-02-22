@@ -1371,7 +1371,7 @@ NtUserSetWindowDisplayAffinity	5491
 NtUserSetWindowFNID	4237
 NtUserSetWindowFeedbackSetting	5492
 NtUserSetWindowLong	4182
-NtUserSetWindowLongPtr	3423472645
+NtUserSetWindowLongPtr	5559
 NtUserSetWindowMessageCapability	5493
 NtUserSetWindowPlacement	4303
 NtUserSetWindowPos	4129
