@@ -188,6 +188,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hde\hde32.c" />
+    <ClCompile Include="hde\hde64.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="minirtl\cmdline.c" />
     <ClCompile Include="minirtl\ultostr.c" />

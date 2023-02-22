@@ -27,9 +27,9 @@
 + Windows 11 22H2 build 22622;
 + Windows 11 22H2 build 22623;
 + Windows 11 ADB build 25217;
-+ Windows 11 ADB build 25247;
 + Windows 11 ADB build 25267;
-+ Windows 11 ADB build 25276.
++ Windows 11 ADB build 25276;
++ Windows 11 ADB build 25300.
 
 ** located in Tables\ntos
 
@@ -63,9 +63,9 @@ NT10 (Windows 10/11)
 + Windows 11 22H2 build 22622;
 + Windows 11 22H2 build 22623;
 + Windows 11 ADB build 25217;
-+ Windows 11 ADB build 25247;
 + Windows 11 ADB build 25267;
-+ Windows 11 ADB build 25276.
++ Windows 11 ADB build 25276;
++ Windows 11 ADB build 25300.
 
 ** located in Tables\win32k
 

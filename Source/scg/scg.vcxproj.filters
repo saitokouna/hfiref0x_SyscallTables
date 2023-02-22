@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="hde">
+      <UniqueIdentifier>{4a659f63-c2d9-485f-b554-ea7adbcd2c0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -41,6 +44,12 @@
     </ClCompile>
     <ClCompile Include="minirtl\_strcmpi.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hde\hde32.c">
+      <Filter>hde</Filter>
+    </ClCompile>
+    <ClCompile Include="hde\hde64.c">
+      <Filter>hde</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

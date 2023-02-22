@@ -4,9 +4,9 @@
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.10
+*  VERSION:     1.20
 *
-*  DATE:        15 Jan 2023
+*  DATE:        20 Feb 2023
 *
 *  Ntdll/Win32u/Iumdll Syscall dumper
 *  Based on gr8 scg project
@@ -44,6 +44,14 @@
 #include "minirtl\minirtl.h"
 
 #pragma comment(lib, "version.lib")
+
+#if defined _M_X64
+#include "hde/hde64.h"
+#elif defined _M_IX86
+#include "hde/hde32.h"
+#elif
+#error Unknown architecture, check build configuration
+#endif
 
 typedef enum tagScgDllType {
     ScgNtDll = 0,
@@ -172,15 +180,21 @@ VOID ProcessExportEntry(
     _In_ PULONG FunctionsTableBase,
     _In_ PUSHORT NameOrdinalTableBase,
     _In_ PCHAR FunctionName,
-    _In_ BOOL Is64,
     _In_ ScgDllType DllType
 )
 {
     SIZE_T FunctionNameLength;
     DWORD sid;
-    PCHAR FunctionAddress;
+    PBYTE ptrCode;
+    ULONG i, max;
 
     USHORT targetUShort;
+
+#if defined _M_X64
+    hde64s hs;
+#elif defined _M_IX86
+    hde32s hs;
+#endif
 
     if (DllType == ScgIumDll)
         targetUShort = 'uI';
@@ -191,19 +205,43 @@ VOID ProcessExportEntry(
 
         FunctionNameLength = _strlen_a(FunctionName);
         if (FunctionNameLength <= MAX_PATH) {
+            
             sid = (DWORD)-1;
-            FunctionAddress = (CHAR*)RtlOffsetToPointer(ImageBase, FunctionsTableBase[NameOrdinalTableBase[EntryIndex]]);
+            ptrCode = (PBYTE)RtlOffsetToPointer(ImageBase, FunctionsTableBase[NameOrdinalTableBase[EntryIndex]]);
+            i = 0;
+#if defined _M_X64
+            max = 32;
+#elif defined _M_IX86
+            max = 16;
+#endif
 
-            if (Is64) {
-                if (*(UCHAR*)((UCHAR*)FunctionAddress + 3) == 0xB8) {
-                    sid = *(ULONG*)((UCHAR*)FunctionAddress + 4);
+            do {
+#if defined _M_X64
+                hde64_disasm(RtlOffsetToPointer(ptrCode, i), &hs);
+#elif defined _M_IX86
+                hde32_disasm(RtlOffsetToPointer(ptrCode, i), &hs);
+#endif
+                if (hs.flags & F_ERROR) {
+                    DbgPrint("scg: disassembly error\r\n");
+                    break;
                 }
-            }
-            else {
-                if (*(UCHAR*)FunctionAddress == 0xB8) {
-                    sid = *(ULONG*)((UCHAR*)FunctionAddress + 1);
+                else {
+
+                    if (hs.len == 5) {
+                        if (ptrCode[i] == 0xE9)
+                            break;
+
+                        if (ptrCode[i] == 0xB8) {
+                            sid = *(ULONG*)(ptrCode + i + 1);
+                        }
+                    }
+
                 }
-            }
+
+                i += hs.len;
+
+            } while (i < max);
+
             if (sid != (DWORD)-1) {
                 printf_s("%s\t%lu\n", FunctionName, sid);
             }
@@ -212,7 +250,7 @@ VOID ProcessExportEntry(
             }
         }
         else {
-            DbgPrint("scg: Unexpected function name length %llu\r\n", FunctionNameLength);
+            DbgPrint("scg: Unexpected function name length %zu\r\n", FunctionNameLength);
         }
     }
 }
@@ -228,11 +266,13 @@ VOID ProcessExportEntry(
 VOID ParseInputFile(
     _In_ LPCWSTR lpFileName)
 {
-    BOOL                     Is64 = FALSE;
-    PIMAGE_FILE_HEADER       fHeader;
-    PIMAGE_OPTIONAL_HEADER32 oh32 = NULL;
-    PIMAGE_OPTIONAL_HEADER64 oh64 = NULL;
-    PIMAGE_EXPORT_DIRECTORY  ExportDirectory = NULL;
+    PIMAGE_FILE_HEADER FileHeader;
+
+    union {
+        PIMAGE_OPTIONAL_HEADER32 oh32;
+        PIMAGE_OPTIONAL_HEADER64 oh64;
+    } oh;
+    PIMAGE_EXPORT_DIRECTORY ExportDirectory = NULL;
 
     PULONG NameTableBase;
     PULONG FunctionsTableBase;
@@ -256,34 +296,43 @@ VOID ParseInputFile(
 
     __try {
 
-        fHeader = (PIMAGE_FILE_HEADER)RtlOffsetToPointer(pvImageBase,
+        FileHeader = (PIMAGE_FILE_HEADER)RtlOffsetToPointer(pvImageBase,
             ((PIMAGE_DOS_HEADER)pvImageBase)->e_lfanew + sizeof(DWORD));
 
-        switch (fHeader->Machine) {
+        switch (FileHeader->Machine) {
 
         case IMAGE_FILE_MACHINE_I386:
-            oh32 = (PIMAGE_OPTIONAL_HEADER32)RtlOffsetToPointer(fHeader,
+
+#ifdef _M_X64
+            printf_s("scg: 32-bit machine image\r\nscg: use x86-32 version of scg to process this file\r\n");
+            __leave;
+#else
+            oh.oh32 = (PIMAGE_OPTIONAL_HEADER32)RtlOffsetToPointer(FileHeader,
                 sizeof(IMAGE_FILE_HEADER));
 
             ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)RtlOffsetToPointer(pvImageBase,
-                oh32->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+                oh.oh32->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+#endif
 
             break;
 
         case  IMAGE_FILE_MACHINE_AMD64:
-            oh64 = (PIMAGE_OPTIONAL_HEADER64)RtlOffsetToPointer(fHeader,
+
+#ifdef _M_IX86
+            printf_s("scg: 64-bit machine image\r\nscg: use x64 version of scg to process this file\r\n");
+            __leave;
+#else 
+            oh.oh64 = (PIMAGE_OPTIONAL_HEADER64)RtlOffsetToPointer(FileHeader,
                 sizeof(IMAGE_FILE_HEADER));
 
             ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)RtlOffsetToPointer(pvImageBase,
-                oh64->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+                oh.oh64->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 
-            Is64 = TRUE;
-
+#endif
             break;
 
         default:
-
-            printf_s("scg: unexpected image machine type %lx\r\n", fHeader->Machine);
+            printf_s("scg: unexpected image machine type %lx\r\n", FileHeader->Machine);
             break;
         }
 
@@ -301,7 +350,6 @@ VOID ParseInputFile(
                     FunctionsTableBase,
                     NameOrdinalTableBase,
                     RtlOffsetToPointer(pvImageBase, NameTableBase[entryIndex]),
-                    Is64,
                     dllType);
 
             }
@@ -339,7 +387,15 @@ int main()
         ParseInputFile((LPCWSTR)szInputFile);
     }
     else {
-        printf_s("Syscall Generator (NTOS/WIN32K/IUM)\r\nSupports ntdll/win32u/iumdll dlls as targets\r\nUsage: scg filename");
+        printf_s("Syscall Generator (NTOS/WIN32K/IUM)\r\nSupports ntdll/win32u/iumdll dlls as targets\r\nUsage: scg filename\r\n");
+#ifdef _M_X64
+        printf_s("win64 release");
+#elif _M_IX86
+        printf_s("win32 release");
+#elif
+        printf_s("unsupported architecture");
+        return;
+#endif
     }
 
     return 0;
