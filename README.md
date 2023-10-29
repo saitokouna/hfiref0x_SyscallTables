@@ -24,7 +24,7 @@
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
-+ Windows 11 22H2 build 22631;
++ Windows 11 23H2 build 22631;
 + Windows 11 ADB build 23451;
 + Windows 11 ADB build 23481;
 + Windows 11 24H2 build 25905;
@@ -60,7 +60,7 @@ NT10 (Windows 10/11)
 + Windows Server 2022 build 20348;
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
-+ Windows 11 22H2 build 22631;
++ Windows 11 23H2 build 22631;
 + Windows 11 ADB build 23451;
 + Windows 11 ADB build 23481;
 + Windows 11 24H2 build 25905;
