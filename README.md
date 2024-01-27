@@ -25,11 +25,11 @@
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
 + Windows 11 23H2 build 22631;
-+ Windows 11 ADB build 23451;
 + Windows 11 ADB build 23481;
 + Windows 11 24H2 build 25905;
 + Windows 11 24H2 build 25982;
-+ Windows 11 24H2 build 26016.
++ Windows 11 24H2 build 26016;
++ Windows 11 24H2 build 26040.
 
 
 ** located in Tables\ntos
@@ -62,10 +62,10 @@ NT10 (Windows 10/11)
 + Windows 11 21H2 build 22000;
 + Windows 11 22H2 build 22621;
 + Windows 11 23H2 build 22631;
-+ Windows 11 ADB build 23451;
 + Windows 11 ADB build 23481;
 + Windows 11 24H2 build 25982;
-+ Windows 11 24H2 build 26016.
++ Windows 11 24H2 build 26016;
++ Windows 11 24H2 build 26040.
 
 ** located in Tables\win32k
 
@@ -99,8 +99,8 @@ Composer source code written in C#. In order to build from source you need Micro
 
 # Authors
 
-+ scg (c) 2018 - 2023 SyscallTables Project
-+ sstComposer (c) 2016 - 2023 SyscallTables Project
++ scg (c) 2018 - 2024 SyscallTables Project
++ sstComposer (c) 2016 - 2024 SyscallTables Project
 + wscg64 (c) 2016 - 2021 SyscallTables Project, portions (c) 2010 deroko of ARTeam
 
 Original scg (c) 2011 gr8
