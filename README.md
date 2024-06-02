@@ -26,8 +26,8 @@
 + Windows 11 22H2 build 22621;
 + Windows 11 23H2 build 22631;
 + Windows 11 24H2 build 26120;
-+ Windows 11 24H2 build 26212.
-
++ Windows 11 24H2 build 26212;
++ Windows 11 24H2 build 26227.
 
 ** located in Tables\ntos
 
@@ -60,7 +60,8 @@ NT10 (Windows 10/11)
 + Windows 11 22H2 build 22621;
 + Windows 11 23H2 build 22631;
 + Windows 11 24H2 build 26120;
-+ Windows 11 24H2 build 26212.
++ Windows 11 24H2 build 26212;
++ Windows 11 24H2 build 26227.
 
 ** located in Tables\win32k
 
