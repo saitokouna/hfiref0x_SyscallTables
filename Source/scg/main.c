@@ -34,12 +34,9 @@
 #endif
 #endif
 
-#pragma warning(disable: 4091) //'typedef ': ignored on left of '' when no variable is declared
-
 #include <Windows.h>
 #include <stdio.h>
 #include <strsafe.h>
-#include "ntos.h"
 #include "minirtl\cmdline.h"
 #include "minirtl\minirtl.h"
 
@@ -59,15 +56,19 @@ typedef struct _LANGANDCODEPAGE {
     WORD wCodePage;
 } LANGANDCODEPAGE, * LPTRANSLATE;
 
+#ifndef RtlOffsetToPointer
+#define RtlOffsetToPointer(Base, Offset)  ((PCHAR)( ((PCHAR)(Base)) + ((ULONG_PTR)(Offset))))
+#endif
+
 /*
-* LdrMapInputFile
+* MapInputFile
 *
 * Purpose:
 *
 * Create mapped section from input file.
 *
 */
-PVOID LdrMapInputFile(
+PVOID MapInputFile(
     _In_ LPCWSTR lpFileName
 )
 {
@@ -179,11 +180,12 @@ VOID ProcessExportEntry(
     DWORD sid;
     PBYTE ptrCode;
     ULONG i, max, value;
-    
+
     USHORT targetUShort;
     ZydisDisassembledInstruction instruction;
     ZyanU64 runtime_address;
     ZyanUSize offset;
+    ZydisMachineMode machineMode;
     CHAR nameBuffer[MAX_PATH];
 
     switch (DllType) {
@@ -197,7 +199,6 @@ VOID ProcessExportEntry(
         targetUShort = 'wZ';
         break;
     }
-
 
     if (*(USHORT*)FunctionName == targetUShort) {
 
@@ -214,10 +215,12 @@ VOID ProcessExportEntry(
             {
             case IMAGE_FILE_MACHINE_I386:
                 max = 16;
+                machineMode = ZYDIS_MACHINE_MODE_LEGACY_32;
                 break;
             case IMAGE_FILE_MACHINE_AMD64:
             default:
                 max = 32;
+                machineMode = ZYDIS_MACHINE_MODE_LONG_64;
                 break;
             }
 
@@ -230,7 +233,7 @@ VOID ProcessExportEntry(
                 RtlSecureZeroMemory(&instruction, sizeof(instruction));
 
                 while (ZYAN_SUCCESS(ZydisDisassembleIntel(
-                    ZYDIS_MACHINE_MODE_LONG_64,
+                    machineMode,
                     runtime_address,
                     ptrCode + offset,
                     max - offset,
@@ -266,11 +269,11 @@ VOID ProcessExportEntry(
                 printf_s("%s\t%lu\n", nameBuffer, sid);
             }
             else {
-                DbgPrint("scg: syscall index for %s not found\r\n", nameBuffer);
+                printf_s("scg: syscall index for %s not found\r\n", nameBuffer);
             }
         }
         else {
-            DbgPrint("scg: Unexpected function name length %zu\r\n", FunctionNameLength);
+            printf_s("scg: Unexpected function name length %zu\r\n", FunctionNameLength);
         }
     }
 }
@@ -308,7 +311,7 @@ VOID ParseInputFile(
         return;
     }
 
-    pvImageBase = LdrMapInputFile(lpFileName);
+    pvImageBase = MapInputFile(lpFileName);
     if (pvImageBase == NULL) {
         printf_s("scg: cannot load input file, GetLastError %lu\r\n", GetLastError());
         return;

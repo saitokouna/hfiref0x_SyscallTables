@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="zydys">
+    <Filter Include="zydis">
       <UniqueIdentifier>{bf9f4a5f-db9e-4753-a972-e4e2af5fc431}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -46,7 +46,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zydis\Zydis.c">
-      <Filter>zydys</Filter>
+      <Filter>zydis</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -62,11 +62,8 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ntos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zydis\Zydis.h">
-      <Filter>zydys</Filter>
+      <Filter>zydis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
