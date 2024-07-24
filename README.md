@@ -1,6 +1,6 @@
 
 # Syscall tables
-## Combined Windows x64 syscall tables
+## Combined Windows syscall tables
 
 ## Ntoskrnl service tables
 
@@ -27,17 +27,19 @@
 + Windows 11 23H2 build 22631;
 + Windows 11 24H2 build 26120;
 + Windows 11 24H2 build 26212;
-+ Windows 11 24H2 build 26227.
++ Windows 11 24H2 build 26227;
++ Windows 11 24H2 build 26231;
++ Windows 11 24H2 build 26252.
 
-** located in Tables\ntos
+** located in Compiled\Composition\X86_64\ntos
 
 NT6 (Windows Vista/7/8/8.1) + bonus NT5.2 (Windows XP x64)
 
-**View online** https://hfiref0x.github.io/NT6_syscalls.html
+**View online** https://hfiref0x.github.io/X86_64/NT6_syscalls.html
 
 NT10 (Windows 10/11)
 
-**View online** https://hfiref0x.github.io/NT10_syscalls.html
+**View online** https://hfiref0x.github.io/X86_64/NT10_syscalls.html
 
 ## Win32k service tables
 
@@ -61,17 +63,41 @@ NT10 (Windows 10/11)
 + Windows 11 23H2 build 22631;
 + Windows 11 24H2 build 26120;
 + Windows 11 24H2 build 26212;
-+ Windows 11 24H2 build 26227.
++ Windows 11 24H2 build 26227;
++ Windows 11 24H2 build 26231;
++ Windows 11 24H2 build 26252.
 
-** located in Tables\win32k
+** located in Compiled\Composition\X86_64\win32k
 
 NT6 (Windows Vista/7/8/8.1)
 
-**View online** https://hfiref0x.github.io/NT6_w32ksyscalls.html
+**View online** https://hfiref0x.github.io/X86_64/NT6_w32ksyscalls.html
 
 NT10 (Windows 10/11)
 
-**View online** https://hfiref0x.github.io/NT10_w32ksyscalls.html
+**View online** https://hfiref0x.github.io/X86_64/NT10_w32ksyscalls.html
+
+# ARM64
+
+## Ntoskrnl service tables
+
++ Windows 11 23H2 build 22631.
+
+** located in Compiled\Composition\ARM64\ntos
+
+NT10 (Windows 10/11)
+
+**View online** https://hfiref0x.github.io/ARM64/syscalls.html
+
+## Win32k service tables
+
++ Windows 11 23H2 build 22631.
+
+** located in Compiled\Composition\ARM64\win32k
+
+NT10 (Windows 10/11)
+
+**View online** https://hfiref0x.github.io/ARM64/w32ksyscalls.html
 
 # Usage
 
@@ -89,9 +115,12 @@ Run Examples:
 * sstc -h -d OnlyW10
 * sstc -h -w
 
+# 3rd party code usage
+Uses Zydis x86/x86-64 disassembler and code generation library (https://github.com/zyantific/zydis)
+
 # Build
 
-Composer source code written in C#. In order to build from source you need Microsoft Visual Studio version 2017 and higher and .NET Framework version 4.5 and higher. Both scg and wscg source code written in C. In order to build from source you need Microsoft Visual Studio version 2017 with SDK 17763 installed and higher.
+Composer source code written in C#. In order to build from source you need Microsoft Visual Studio version 2022 and higher and .NET Framework version 4.5 and higher. Both scg and wscg source code written in C. In order to build from source you need Microsoft Visual Studio version 2022 with SDK 19041 or higher installed.
 
 # Authors
 

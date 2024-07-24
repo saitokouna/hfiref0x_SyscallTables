@@ -13,8 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="hde">
-      <UniqueIdentifier>{4a659f63-c2d9-485f-b554-ea7adbcd2c0c}</UniqueIdentifier>
+    <Filter Include="zydys">
+      <UniqueIdentifier>{bf9f4a5f-db9e-4753-a972-e4e2af5fc431}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,11 +45,8 @@
     <ClCompile Include="minirtl\_strcmpi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hde\hde32.c">
-      <Filter>hde</Filter>
-    </ClCompile>
-    <ClCompile Include="hde\hde64.c">
-      <Filter>hde</Filter>
+    <ClCompile Include="zydis\Zydis.c">
+      <Filter>zydys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="ntos.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zydis\Zydis.h">
+      <Filter>zydys</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

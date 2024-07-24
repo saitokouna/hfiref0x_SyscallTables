@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2018 - 2023
+*  (C) COPYRIGHT AUTHORS, 2018 - 2024
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.20
+*  VERSION:     1.30
 *
-*  DATE:        20 Feb 2023
+*  DATE:        25 Jul 2024
 *
 *  Ntdll/Win32u/Iumdll Syscall dumper
 *  Based on gr8 scg project
@@ -43,15 +43,9 @@
 #include "minirtl\cmdline.h"
 #include "minirtl\minirtl.h"
 
-#pragma comment(lib, "version.lib")
+#include <Zydis.h>
 
-#if defined _M_X64
-#include "hde/hde64.h"
-#elif defined _M_IX86
-#include "hde/hde32.h"
-#elif
-#error Unknown architecture, check build configuration
-#endif
+#pragma comment(lib, "version.lib")
 
 typedef enum tagScgDllType {
     ScgNtDll = 0,
@@ -175,79 +169,104 @@ ScgDllType GetDllType(
 }
 
 VOID ProcessExportEntry(
-    _In_ ULONG EntryIndex,
-    _In_ PVOID ImageBase,
-    _In_ PULONG FunctionsTableBase,
-    _In_ PUSHORT NameOrdinalTableBase,
+    _In_ PCHAR FunctionCode,
     _In_ PCHAR FunctionName,
-    _In_ ScgDllType DllType
+    _In_ ScgDllType DllType,
+    _In_ WORD MachineType
 )
 {
     SIZE_T FunctionNameLength;
     DWORD sid;
     PBYTE ptrCode;
-    ULONG i, max;
-
+    ULONG i, max, value;
+    
     USHORT targetUShort;
+    ZydisDisassembledInstruction instruction;
+    ZyanU64 runtime_address;
+    ZyanUSize offset;
+    CHAR nameBuffer[MAX_PATH];
 
-#if defined _M_X64
-    hde64s hs;
-#elif defined _M_IX86
-    hde32s hs;
-#endif
-
-    if (DllType == ScgIumDll)
+    switch (DllType) {
+    case ScgIumDll:
         targetUShort = 'uI';
-    else
+        break;
+    case ScgWin32u:
         targetUShort = 'tN';
+        break;
+    default:
+        targetUShort = 'wZ';
+        break;
+    }
+
 
     if (*(USHORT*)FunctionName == targetUShort) {
 
         FunctionNameLength = _strlen_a(FunctionName);
         if (FunctionNameLength <= MAX_PATH) {
-            
+
+            _strncpy_a(nameBuffer, MAX_PATH, FunctionName, FunctionNameLength);
+
             sid = (DWORD)-1;
-            ptrCode = (PBYTE)RtlOffsetToPointer(ImageBase, FunctionsTableBase[NameOrdinalTableBase[EntryIndex]]);
+            ptrCode = (PBYTE)FunctionCode;
             i = 0;
-#if defined _M_X64
-            max = 32;
-#elif defined _M_IX86
-            max = 16;
-#endif
 
-            do {
-#if defined _M_X64
-                hde64_disasm(RtlOffsetToPointer(ptrCode, i), &hs);
-#elif defined _M_IX86
-                hde32_disasm(RtlOffsetToPointer(ptrCode, i), &hs);
-#endif
-                if (hs.flags & F_ERROR) {
-                    DbgPrint("scg: disassembly error\r\n");
-                    break;
-                }
-                else {
+            switch (MachineType)
+            {
+            case IMAGE_FILE_MACHINE_I386:
+                max = 16;
+                break;
+            case IMAGE_FILE_MACHINE_AMD64:
+            default:
+                max = 32;
+                break;
+            }
 
-                    if (hs.len == 5) {
-                        if (ptrCode[i] == 0xE9)
-                            break;
+            if (MachineType == IMAGE_FILE_MACHINE_AMD64 ||
+                MachineType == IMAGE_FILE_MACHINE_I386)
+            {
+                offset = 0;
+                runtime_address = (ZyanU64)ptrCode;
 
-                        if (ptrCode[i] == 0xB8) {
-                            sid = *(ULONG*)(ptrCode + i + 1);
-                            break;
-                        }
+                RtlSecureZeroMemory(&instruction, sizeof(instruction));
+
+                while (ZYAN_SUCCESS(ZydisDisassembleIntel(
+                    ZYDIS_MACHINE_MODE_LONG_64,
+                    runtime_address,
+                    ptrCode + offset,
+                    max - offset,
+                    &instruction)))
+                {
+                    if (instruction.info.length == 5 &&
+                        instruction.info.mnemonic == ZYDIS_MNEMONIC_MOV &&
+                        instruction.info.operand_count == 2 &&
+                        instruction.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
+                        instruction.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE)
+                    {
+                        sid = (DWORD)instruction.operands[1].imm.value.u;
+                        Beep(0, 0);
+                        break;
                     }
-
+                    offset += instruction.info.length;
+                    runtime_address += instruction.info.length;
                 }
-
-                i += hs.len;
-
-            } while (i < max);
+            }
+            else if (MachineType == IMAGE_FILE_MACHINE_ARM64) {
+                value = *(DWORD*)ptrCode;
+                sid = (value >> 5) & 0xffff;
+            }
 
             if (sid != (DWORD)-1) {
-                printf_s("%s\t%lu\n", FunctionName, sid);
+                if (DllType == ScgNtDll) {
+                    //
+                    // Hack for consistency.
+                    //
+                    nameBuffer[0] = 'N';
+                    nameBuffer[1] = 't';
+                }
+                printf_s("%s\t%lu\n", nameBuffer, sid);
             }
             else {
-                DbgPrint("scg: syscall index for %s not found\r\n", FunctionName);
+                DbgPrint("scg: syscall index for %s not found\r\n", nameBuffer);
             }
         }
         else {
@@ -304,32 +323,23 @@ VOID ParseInputFile(
 
         case IMAGE_FILE_MACHINE_I386:
 
-#ifdef _M_X64
-            printf_s("scg: 32-bit machine image\r\nscg: use x86-32 version of scg to process this file\r\n");
-            __leave;
-#else
             oh.oh32 = (PIMAGE_OPTIONAL_HEADER32)RtlOffsetToPointer(FileHeader,
                 sizeof(IMAGE_FILE_HEADER));
 
             ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)RtlOffsetToPointer(pvImageBase,
                 oh.oh32->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
-#endif
 
             break;
 
-        case  IMAGE_FILE_MACHINE_AMD64:
+        case IMAGE_FILE_MACHINE_ARM64:
+        case IMAGE_FILE_MACHINE_AMD64:
 
-#ifdef _M_IX86
-            printf_s("scg: 64-bit machine image\r\nscg: use x64 version of scg to process this file\r\n");
-            __leave;
-#else 
             oh.oh64 = (PIMAGE_OPTIONAL_HEADER64)RtlOffsetToPointer(FileHeader,
                 sizeof(IMAGE_FILE_HEADER));
 
             ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)RtlOffsetToPointer(pvImageBase,
                 oh.oh64->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 
-#endif
             break;
 
         default:
@@ -346,17 +356,13 @@ VOID ParseInputFile(
             for (entryIndex = 0; entryIndex < ExportDirectory->NumberOfNames; entryIndex++) {
 
                 ProcessExportEntry(
-                    entryIndex,
-                    pvImageBase,
-                    FunctionsTableBase,
-                    NameOrdinalTableBase,
+                    RtlOffsetToPointer(pvImageBase, FunctionsTableBase[NameOrdinalTableBase[entryIndex]]),
                     RtlOffsetToPointer(pvImageBase, NameTableBase[entryIndex]),
-                    dllType);
+                    dllType,
+                    FileHeader->Machine);
 
             }
-
         }
-
     }
     __finally {
         UnmapViewOfFile(pvImageBase);
@@ -389,14 +395,6 @@ int main()
     }
     else {
         printf_s("Syscall Generator (NTOS/WIN32K/IUM)\r\nSupports ntdll/win32u/iumdll dlls as targets\r\nUsage: scg filename\r\n");
-#ifdef _M_X64
-        printf_s("win64 release");
-#elif _M_IX86
-        printf_s("win32 release");
-#elif
-        printf_s("unsupported architecture");
-        return;
-#endif
     }
 
     return 0;

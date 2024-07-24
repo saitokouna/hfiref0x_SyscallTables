@@ -103,7 +103,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;ZYDIS_STATIC_BUILD;ZYAN_NO_LIBC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -119,9 +119,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;ZYDIS_STATIC_BUILD;ZYAN_NO_LIBC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <CompileAs>CompileAsC</CompileAs>
+      <AdditionalIncludeDirectories>zydis;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +139,7 @@
       <Optimization>MinSpace</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;ZYDIS_STATIC_BUILD;ZYAN_NO_LIBC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ControlFlowGuard>Guard</ControlFlowGuard>
@@ -147,6 +148,7 @@
       <CompileAs>CompileAsC</CompileAs>
       <EnablePREfast>false</EnablePREfast>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>zydis;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,7 +168,7 @@
       <Optimization>MinSpace</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;ZYDIS_STATIC_BUILD;ZYAN_NO_LIBC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ControlFlowGuard>Guard</ControlFlowGuard>
@@ -175,6 +177,7 @@
       <CompileAs>CompileAsC</CompileAs>
       <EnablePREfast>false</EnablePREfast>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>zydis;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,8 +191,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="hde\hde32.c" />
-    <ClCompile Include="hde\hde64.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="minirtl\cmdline.c" />
     <ClCompile Include="minirtl\ultostr.c" />
@@ -199,6 +200,7 @@
     <ClCompile Include="minirtl\_strend.c" />
     <ClCompile Include="minirtl\_strlen.c" />
     <ClCompile Include="minirtl\_strncpy.c" />
+    <ClCompile Include="zydis\Zydis.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="minirtl\cmdline.h" />
@@ -206,6 +208,7 @@
     <ClInclude Include="minirtl\rtltypes.h" />
     <ClInclude Include="ntos.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="zydis\Zydis.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res.rc" />
