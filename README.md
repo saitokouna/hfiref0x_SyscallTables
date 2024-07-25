@@ -123,7 +123,6 @@ NT10 (Windows 10/11)
 Run Examples:
 * scg64.exe c:\wfiles\ntdll\ntdll_7600.dll > table7600.txt
 * scg64.exe c:\wfiles\win32u\win32u_11.dll > win32u_11.txt 
-* wscg64.exe c:\wfiles\win32k\10240\win32k.sys > wtable10240.txt
 * sstc -w
 * sstc -h
 * sstc -h -d OnlyW10
