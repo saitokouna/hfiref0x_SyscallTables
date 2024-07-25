@@ -176,7 +176,7 @@ VOID ProcessExportEntry(
     _In_ WORD MachineType
 )
 {
-    SIZE_T FunctionNameLength;
+    size_t cchFuncName = 0;
     DWORD sid;
     PBYTE ptrCode;
     ULONG i, max, value;
@@ -200,81 +200,88 @@ VOID ProcessExportEntry(
         break;
     }
 
-    if (*(USHORT*)FunctionName == targetUShort) {
+    if (*(USHORT*)FunctionName != targetUShort) {
+        return;
+    }
 
-        FunctionNameLength = _strlen_a(FunctionName);
-        if (FunctionNameLength <= MAX_PATH) {
+    if (S_OK != StringCchLengthA(FunctionName, MAX_PATH, &cchFuncName))
+    {
+        printf_s("scg: Unexpected function name length %zu\r\n", cchFuncName);
+    }
 
-            _strncpy_a(nameBuffer, MAX_PATH, FunctionName, FunctionNameLength);
+    if (S_OK != StringCchCopyNA(nameBuffer, MAX_PATH, FunctionName, cchFuncName))
+    {
+        printf_s("scg: Unexpected error with function name\r\n");
+    }
 
-            sid = (DWORD)-1;
-            ptrCode = (PBYTE)FunctionCode;
-            i = 0;
+    sid = (DWORD)-1;
+    ptrCode = (PBYTE)FunctionCode;
+    i = 0;
 
-            switch (MachineType)
+    switch (MachineType)
+    {
+    case IMAGE_FILE_MACHINE_I386:
+        max = 16;
+        machineMode = ZYDIS_MACHINE_MODE_LEGACY_32;
+        break;
+    case IMAGE_FILE_MACHINE_AMD64:
+    default:
+        max = 32;
+        machineMode = ZYDIS_MACHINE_MODE_LONG_64;
+        break;
+    }
+
+    if (MachineType == IMAGE_FILE_MACHINE_AMD64 ||
+        MachineType == IMAGE_FILE_MACHINE_I386)
+    {
+        offset = 0;
+        runtime_address = (ZyanU64)ptrCode;
+
+        RtlSecureZeroMemory(&instruction, sizeof(instruction));
+
+        while (ZYAN_SUCCESS(ZydisDisassembleIntel(
+            machineMode,
+            runtime_address,
+            ptrCode + offset,
+            max - offset,
+            &instruction)))
+        {
+            //
+            // mov reg, SyscallId
+            //
+            if (instruction.info.length == 5 &&
+                instruction.info.mnemonic == ZYDIS_MNEMONIC_MOV &&
+                instruction.info.operand_count == 2 &&
+                instruction.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
+                instruction.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE)
             {
-            case IMAGE_FILE_MACHINE_I386:
-                max = 16;
-                machineMode = ZYDIS_MACHINE_MODE_LEGACY_32;
-                break;
-            case IMAGE_FILE_MACHINE_AMD64:
-            default:
-                max = 32;
-                machineMode = ZYDIS_MACHINE_MODE_LONG_64;
+                sid = (DWORD)instruction.operands[1].imm.value.u;
                 break;
             }
-
-            if (MachineType == IMAGE_FILE_MACHINE_AMD64 ||
-                MachineType == IMAGE_FILE_MACHINE_I386)
-            {
-                offset = 0;
-                runtime_address = (ZyanU64)ptrCode;
-
-                RtlSecureZeroMemory(&instruction, sizeof(instruction));
-
-                while (ZYAN_SUCCESS(ZydisDisassembleIntel(
-                    machineMode,
-                    runtime_address,
-                    ptrCode + offset,
-                    max - offset,
-                    &instruction)))
-                {
-                    if (instruction.info.length == 5 &&
-                        instruction.info.mnemonic == ZYDIS_MNEMONIC_MOV &&
-                        instruction.info.operand_count == 2 &&
-                        instruction.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-                        instruction.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE)
-                    {
-                        sid = (DWORD)instruction.operands[1].imm.value.u;
-                        Beep(0, 0);
-                        break;
-                    }
-                    offset += instruction.info.length;
-                    runtime_address += instruction.info.length;
-                }
-            }
-            else if (MachineType == IMAGE_FILE_MACHINE_ARM64) {
-                value = *(DWORD*)ptrCode;
-                sid = (value >> 5) & 0xffff;
-            }
-
-            if (sid != (DWORD)-1) {
-                if (DllType == ScgNtDll) {
-                    //
-                    // Hack for consistency.
-                    //
-                    nameBuffer[0] = 'N';
-                    nameBuffer[1] = 't';
-                }
-                printf_s("%s\t%lu\n", nameBuffer, sid);
-            }
-            else {
-                printf_s("scg: syscall index for %s not found\r\n", nameBuffer);
-            }
+            offset += instruction.info.length;
+            runtime_address += instruction.info.length;
         }
-        else {
-            printf_s("scg: Unexpected function name length %zu\r\n", FunctionNameLength);
+    }
+    else if (MachineType == IMAGE_FILE_MACHINE_ARM64) {
+        //
+        // SVC SyscallId
+        //
+        value = *(DWORD*)ptrCode;
+        sid = (value >> 5) & 0xffff;
+    }
+
+    if (sid != (DWORD)-1) {
+        if (DllType == ScgNtDll) {
+            //
+            // Hack for consistency.
+            //
+            nameBuffer[0] = 'N';
+            nameBuffer[1] = 't';
         }
+        printf_s("%s\t%lu\n", nameBuffer, sid);
+    }
+    else {
+        printf_s("scg: syscall index for %s not found\r\n", nameBuffer);
     }
 }
 

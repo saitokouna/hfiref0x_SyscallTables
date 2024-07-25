@@ -2,6 +2,8 @@
 # Syscall tables
 ## Combined Windows syscall tables
 
+# X86-64
+
 ## Ntoskrnl service tables
 
 + Windows 2003 SP2 build 3790 also Windows XP 64;
@@ -81,7 +83,8 @@ NT10 (Windows 10/11)
 
 ## Ntoskrnl service tables
 
-+ Windows 11 23H2 build 22631.
++ Windows 11 23H2 build 22631;
++ Windows 11 24H2 build 26100.
 
 ** located in Compiled\Composition\ARM64\ntos
 
@@ -91,7 +94,8 @@ NT10 (Windows 10/11)
 
 ## Win32k service tables
 
-+ Windows 11 23H2 build 22631.
++ Windows 11 23H2 build 22631;
++ Windows 11 24H2 build 26100.
 
 ** located in Compiled\Composition\ARM64\win32k
 

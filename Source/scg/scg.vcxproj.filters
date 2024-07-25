@@ -21,32 +21,14 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="minirtl\ultostr.c">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strcat.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strend.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strlen.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="minirtl\cmdline.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strncpy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strcpy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="minirtl\_strcmpi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zydis\Zydis.c">
       <Filter>zydis</Filter>
+    </ClCompile>
+    <ClCompile Include="minirtl\_strcmpi.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
