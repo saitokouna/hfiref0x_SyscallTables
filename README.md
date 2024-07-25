@@ -79,6 +79,16 @@ NT10 (Windows 10/11)
 
 **View online** https://hfiref0x.github.io/X86_64/NT10_w32ksyscalls.html
 
+## IUM service tables
+
++ Windows 10 20H1 build 19041; * Note that 19042, 19043, 19044, 19045 are the same as 19041
++ Windows 11 DEV build 25276.
+
+** located in Compiled\Composition\X86_64\ium
+
+NT10 (Windows 10/11)
+**View online** https://hfiref0x.github.io/X86_64/NT10_iumsyscalls.html
+
 # ARM64
 
 ## Ntoskrnl service tables
