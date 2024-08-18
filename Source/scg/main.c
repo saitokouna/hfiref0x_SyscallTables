@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.30
 *
-*  DATE:        25 Jul 2024
+*  DATE:        18 Aug 2024
 *
 *  Ntdll/Win32u/Iumdll Syscall dumper
 *  Based on gr8 scg project
@@ -280,9 +280,11 @@ VOID ProcessExportEntry(
         }
         printf_s("%s\t%lu\n", nameBuffer, sid);
     }
+#ifdef _DEBUG
     else {
         printf_s("scg: syscall index for %s not found\r\n", nameBuffer);
     }
+#endif
 }
 
 /*
