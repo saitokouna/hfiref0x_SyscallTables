@@ -30,7 +30,8 @@
 + Windows 11 24H2 build 26120;
 + Windows 11 25H2 build 27686;
 + Windows 11 25H2 build 27695;
-+ Windows 11 25H2 build 27723.
++ Windows 11 25H2 build 27723;
++ Windows 11 25H2 build 27729.
 
 ** located in Compiled\Composition\X86_64\ntos
 
@@ -65,7 +66,8 @@ NT10 (Windows 10/11)
 + Windows 11 24H2 build 26120;
 + Windows 11 25H2 build 27686;
 + Windows 11 25H2 build 27695;
-+ Windows 11 25H2 build 27723.
++ Windows 11 25H2 build 27723;
++ Windows 11 25H2 build 27729.
 
 ** located in Compiled\Composition\X86_64\win32k
 
