@@ -31,7 +31,8 @@
 + Windows 11 25H2 build 27686;
 + Windows 11 25H2 build 27695;
 + Windows 11 25H2 build 27723;
-+ Windows 11 25H2 build 27729.
++ Windows 11 25H2 build 27729;
++ Windows 11 25H2 build 27783.
 
 ** located in Compiled\Composition\X86_64\ntos
 
@@ -67,7 +68,8 @@ NT10 (Windows 10/11)
 + Windows 11 25H2 build 27686;
 + Windows 11 25H2 build 27695;
 + Windows 11 25H2 build 27723;
-+ Windows 11 25H2 build 27729.
++ Windows 11 25H2 build 27729;
++ Windows 11 25H2 build 27783.
 
 ** located in Compiled\Composition\X86_64\win32k
 
@@ -137,7 +139,7 @@ Composer source code written in C#. In order to build from source you need Micro
 
 # Authors
 
-+ scg (c) 2018 - 2024 SyscallTables Project
-+ sstComposer (c) 2016 - 2024 SyscallTables Project
++ scg (c) 2018 - 2025 SyscallTables Project
++ sstComposer (c) 2016 - 2025 SyscallTables Project
 
 Original scg (c) 2011 gr8
